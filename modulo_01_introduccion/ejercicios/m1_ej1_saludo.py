@@ -10,12 +10,21 @@ def saludar(nombre):
     >>> saludar("  ada lovelace ")
     'Hola, Ada Lovelace. ¡Te damos la bienvenida al curso!'
     """
-    raise NotImplementedError("Completa la función saludar")
+    # split() sin argumentos separa por cualquier espacio y descarta los
+    # sobrantes (al inicio, al final y repetidos entre palabras).
+    palabras = nombre.split()
+    nombre_limpio = " ".join(palabra.capitalize() for palabra in palabras)
+
+    if not nombre_limpio:
+        nombre_limpio = "Anónimo"
+
+    return f"Hola, {nombre_limpio}. ¡Te damos la bienvenida al curso!"
 
 
 def main():
     """Pide el nombre por teclado e imprime el saludo."""
-    raise NotImplementedError("Completa la función main")
+    nombre = input("¿Cómo te llamas? ")
+    print(saludar(nombre))
 
 
 if __name__ == "__main__":
