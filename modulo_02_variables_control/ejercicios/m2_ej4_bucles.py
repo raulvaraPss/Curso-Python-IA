@@ -7,7 +7,10 @@ def factorial(n: int) -> int:
     >>> factorial(5), factorial(0)
     (120, 1)
     """
-    raise NotImplementedError
+    resultado = 1
+    for i in range(2, n + 1):
+        resultado *= i
+    return resultado
 
 
 def es_primo(n: int) -> bool:
@@ -16,7 +19,14 @@ def es_primo(n: int) -> bool:
     >>> es_primo(13), es_primo(15), es_primo(1)
     (True, False, False)
     """
-    raise NotImplementedError
+    if n < 2:
+        return False
+    divisor = 2
+    while divisor * divisor <= n:
+        if n % divisor == 0:
+            return False          # salida anticipada: ya sabemos que no es primo
+        divisor += 1
+    return True
 
 
 def invertir(texto: str) -> str:
@@ -25,7 +35,10 @@ def invertir(texto: str) -> str:
     >>> invertir("Python")
     'nohtyP'
     """
-    raise NotImplementedError
+    resultado = ""
+    for letra in texto:
+        resultado = letra + resultado   # cada letra va delante de lo anterior
+    return resultado
 
 
 def contar_vocales(texto: str) -> int:
@@ -34,7 +47,12 @@ def contar_vocales(texto: str) -> int:
     >>> contar_vocales("Programación")
     5
     """
-    raise NotImplementedError
+    vocales = "aeiouáéíóúü"
+    contador = 0
+    for letra in texto.lower():
+        if letra in vocales:
+            contador += 1
+    return contador
 
 
 def suma_digitos(numero: int) -> int:
@@ -43,7 +61,12 @@ def suma_digitos(numero: int) -> int:
     >>> suma_digitos(1234), suma_digitos(-905)
     (10, 14)
     """
-    raise NotImplementedError
+    numero = abs(numero)
+    suma = 0
+    while numero > 0:
+        suma += numero % 10      # último dígito
+        numero //= 10            # quitamos el último dígito
+    return suma
 
 
 def fizzbuzz(n: int) -> str:
@@ -55,7 +78,17 @@ def fizzbuzz(n: int) -> str:
     >>> fizzbuzz(5)
     '1 2 Fizz 4 Buzz'
     """
-    raise NotImplementedError
+    partes = []
+    for i in range(1, n + 1):
+        if i % 15 == 0:
+            partes.append("FizzBuzz")
+        elif i % 3 == 0:
+            partes.append("Fizz")
+        elif i % 5 == 0:
+            partes.append("Buzz")
+        else:
+            partes.append(str(i))
+    return " ".join(partes)
 
 
 def tabla_multiplicar(numero: int) -> str:
@@ -64,7 +97,10 @@ def tabla_multiplicar(numero: int) -> str:
     >>> print(tabla_multiplicar(7).splitlines()[2])
     7 x  3 =  21
     """
-    raise NotImplementedError
+    lineas = []
+    for i in range(1, 11):
+        lineas.append(f"{numero} x {i:2d} = {numero * i:3d}")
+    return "\n".join(lineas)
 
 
 def primer_multiplo_comun(a: int, b: int) -> int:
@@ -73,4 +109,8 @@ def primer_multiplo_comun(a: int, b: int) -> int:
     >>> primer_multiplo_comun(4, 6)
     12
     """
-    raise NotImplementedError
+    paso = a if a > b else b
+    candidato = paso
+    while candidato % a != 0 or candidato % b != 0:
+        candidato += paso
+    return candidato
