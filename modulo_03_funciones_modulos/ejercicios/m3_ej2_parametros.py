@@ -9,7 +9,7 @@ def potencia(base: float, exponente: float = 2) -> float:
     >>> potencia(2, 10)
     1024
     """
-    raise NotImplementedError
+    return base ** exponente
 
 
 def sumar_todos(*numeros: float) -> float:
@@ -20,7 +20,7 @@ def sumar_todos(*numeros: float) -> float:
     >>> sumar_todos()
     0
     """
-    raise NotImplementedError
+    return sum(numeros)
 
 
 def crear_usuario(nombre: str, *, activo: bool = True, **extras) -> dict:
@@ -35,7 +35,7 @@ def crear_usuario(nombre: str, *, activo: bool = True, **extras) -> dict:
     >>> crear_usuario("Ada", activo=False, rol="admin")
     {'nombre': 'Ada', 'activo': False, 'rol': 'admin'}
     """
-    raise NotImplementedError
+    return {"nombre": nombre, "activo": activo, **extras}
     # También vale en una línea: return {"nombre": nombre, "activo": activo, **extras}
 
 
@@ -51,7 +51,10 @@ def anadir_elemento(elemento, lista: list | None = None) -> list:
     >>> anadir_elemento(3, [1, 2])
     [1, 2, 3]
     """
-    raise NotImplementedError
+    if lista is None:
+        lista = []
+    lista.append(elemento)
+    return lista
 
 
 def formatear_nombre(nombre: str, apellido: str, *, mayusculas: bool = False,
@@ -66,8 +69,10 @@ def formatear_nombre(nombre: str, apellido: str, *, mayusculas: bool = False,
     >>> formatear_nombre("Ada", "Lovelace", mayusculas=True, separador=", ")
     'ADA, LOVELACE'
     """
-    raise NotImplementedError
-
+    resultado = f"{nombre.strip()}{separador}{apellido.strip()}"
+    if mayusculas:
+        resultado = resultado.upper()
+    return resultado
 
 def estadisticas(*numeros: float) -> tuple:
     """Devuelve la tupla (cantidad, suma, media) de los números recibidos.
@@ -79,4 +84,7 @@ def estadisticas(*numeros: float) -> tuple:
     >>> estadisticas()
     (0, 0, None)
     """
-    raise NotImplementedError
+    cantidad = len(numeros)
+    suma = sum(numeros)
+    media = round(suma / cantidad, 2) if cantidad > 0 else None
+    return cantidad, suma, media
