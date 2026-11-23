@@ -11,7 +11,10 @@ def es_entero(texto: str) -> bool:
     >>> es_entero("4.2")
     False
     """
-    raise NotImplementedError
+    texto = texto.strip()
+    if texto[:1] in ("+", "-"):
+        texto = texto[1:]
+    return texto.isdigit()
 
 
 def es_decimal(texto: str) -> bool:
@@ -25,7 +28,13 @@ def es_decimal(texto: str) -> bool:
     >>> es_decimal("3.")
     False
     """
-    raise NotImplementedError
+    texto = texto.strip().replace(",", ".")
+    if es_entero(texto):
+        return True
+    if texto.count(".") != 1:
+        return False
+    entera, decimales = texto.split(".")
+    return es_entero(entera) and decimales.isdigit()
 
 
 def a_decimal(texto: str, por_defecto: float | None = None) -> float | None:
@@ -36,7 +45,9 @@ def a_decimal(texto: str, por_defecto: float | None = None) -> float | None:
     >>> a_decimal("abc", 0.0)
     0.0
     """
-    raise NotImplementedError
+    if not es_decimal(texto):
+        return por_defecto
+    return float(texto.strip().replace(",", "."))
 
 
 def en_rango(valor: float, minimo: float | None = None, maximo: float | None = None) -> bool:
@@ -51,4 +62,8 @@ def en_rango(valor: float, minimo: float | None = None, maximo: float | None = N
     >>> en_rango(5, maximo=10)
     True
     """
-    raise NotImplementedError
+    if minimo is not None and valor < minimo:
+        return False
+    if maximo is not None and valor > maximo:
+        return False
+    return True
