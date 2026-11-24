@@ -11,7 +11,7 @@ def cuadrados_de_pares(limite: int) -> list[int]:
     >>> cuadrados_de_pares(6)
     [0, 4, 16, 36]
     """
-    raise NotImplementedError
+    return [x**2 for x in range(limite + 1) if x % 2 == 0]
 
 
 def longitudes(palabras: list[str]) -> dict[str, int]:
@@ -20,7 +20,7 @@ def longitudes(palabras: list[str]) -> dict[str, int]:
     >>> longitudes(["uva", "kiwi"])
     {'uva': 3, 'kiwi': 4}
     """
-    raise NotImplementedError
+    return {palabra: len(palabra) for palabra in palabras}
 
 
 def iniciales(nombres: list[str]) -> set[str]:
@@ -29,7 +29,7 @@ def iniciales(nombres: list[str]) -> set[str]:
     >>> sorted(iniciales(["ada", "Alan", "grace", ""]))
     ['A', 'G']
     """
-    raise NotImplementedError
+    return {nombre[0].upper() for nombre in nombres if nombre}
 
 
 def limpiar(textos: list[str]) -> list[str]:
@@ -40,7 +40,7 @@ def limpiar(textos: list[str]) -> list[str]:
     >>> limpiar(["  Ada ", "", "LINUS", "   "])
     ['ada', 'linus']
     """
-    raise NotImplementedError
+    return [texto.strip().lower() for texto in textos if texto.strip()]
 
 
 def filtrar_por_precio(precios: dict[str, float], maximo: float) -> dict[str, float]:
@@ -49,7 +49,7 @@ def filtrar_por_precio(precios: dict[str, float], maximo: float) -> dict[str, fl
     >>> filtrar_por_precio({"teclado": 45.0, "raton": 19.9, "monitor": 189.0}, 50)
     {'teclado': 45.0, 'raton': 19.9}
     """
-    raise NotImplementedError
+    return {producto: precio for producto, precio in precios.items() if precio <= maximo}
 
 
 def aplanar(matriz: list[list]) -> list:
@@ -58,7 +58,7 @@ def aplanar(matriz: list[list]) -> list:
     >>> aplanar([[1, 2], [3], [], [4, 5]])
     [1, 2, 3, 4, 5]
     """
-    raise NotImplementedError
+    return [elemento for fila in matriz for elemento in fila]
 
 
 def trasponer(matriz: list[list]) -> list[list]:
@@ -70,8 +70,7 @@ def trasponer(matriz: list[list]) -> list[list]:
     >>> trasponer([[1, 2, 3], [4, 5, 6]])
     [[1, 4], [2, 5], [3, 6]]
     """
-    raise NotImplementedError
-    # Sin zip: [[fila[i] for fila in matriz] for i in range(len(matriz[0]))] if matriz else []
+    return [list(columna) for columna in zip(*matriz)]
 
 
 def suma_de_importes(lineas: list[dict]) -> float:
@@ -80,4 +79,4 @@ def suma_de_importes(lineas: list[dict]) -> float:
     >>> suma_de_importes([{"unidades": 2, "precio": 45.0}, {"unidades": 1, "precio": 19.9}])
     109.9
     """
-    raise NotImplementedError
+    return round(sum(linea["unidades"] * linea["precio"] for linea in lineas), 2)
