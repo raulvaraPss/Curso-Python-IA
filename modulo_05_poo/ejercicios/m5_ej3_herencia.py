@@ -7,7 +7,7 @@ class Empleado(ABC):
     """Clase base abstracta de todos los empleados."""
 
     def __init__(self, nombre: str):
-        raise NotImplementedError
+        self.nombre = nombre
 
     @abstractmethod
     def salario_mensual(self) -> float:
@@ -21,7 +21,7 @@ class Empleado(ABC):
         >>> Fijo("Ada", 36000).descripcion()
         'Ada (Fijo): 3000.00 €'
         """
-        raise NotImplementedError
+        return f"{self.nombre} ({type(self).__name__}): {self.salario_mensual():.2f} €"
 
 
 class Fijo(Empleado):
@@ -29,11 +29,12 @@ class Fijo(Empleado):
 
     def __init__(self, nombre: str, salario_anual: float):
         """Inicializa la parte heredada con ``super()`` y guarda ``salario_anual``."""
-        raise NotImplementedError
+        super().__init__(nombre)
+        self.salario_anual = salario_anual
 
     def salario_mensual(self) -> float:
         """Devuelve el salario anual entre 12, con dos decimales."""
-        raise NotImplementedError
+        return round(self.salario_anual / 12, 2)
 
 
 class PorHoras(Empleado):
@@ -41,11 +42,13 @@ class PorHoras(Empleado):
 
     def __init__(self, nombre: str, horas: float, tarifa: float):
         """Inicializa la parte heredada y guarda ``horas`` y ``tarifa``."""
-        raise NotImplementedError
+        super().__init__(nombre)
+        self.horas = horas
+        self.tarifa = tarifa
 
     def salario_mensual(self) -> float:
         """Devuelve horas por tarifa, con dos decimales."""
-        raise NotImplementedError
+        return round(self.horas * self.tarifa, 2)
 
 
 class Comercial(Fijo):
@@ -53,7 +56,9 @@ class Comercial(Fijo):
 
     def __init__(self, nombre: str, salario_anual: float, ventas: float, comision: float = 5):
         """Inicializa la parte heredada y guarda ``ventas`` y ``comision`` (en %)."""
-        raise NotImplementedError
+        super().__init__(nombre, salario_anual)
+        self.ventas = ventas
+        self.comision = comision
 
     def salario_mensual(self) -> float:
         """Devuelve el salario de un Fijo más la comisión sobre las ventas.
@@ -63,7 +68,7 @@ class Comercial(Fijo):
         >>> Comercial("Grace", 24000, ventas=10000).salario_mensual()
         2500.0
         """
-        raise NotImplementedError
+        return round(super().salario_mensual() + self.ventas * self.comision / 100, 2)
 
 
 def coste_mensual(plantilla: list[Empleado]) -> float:
@@ -72,9 +77,12 @@ def coste_mensual(plantilla: list[Empleado]) -> float:
     >>> coste_mensual([Fijo("Ada", 36000), PorHoras("Linus", 100, 20)])
     5000.0
     """
-    raise NotImplementedError
+    return round(sum(empleado.salario_mensual() for empleado in plantilla), 2)
+
 
 
 def mejor_pagado(plantilla: list[Empleado]) -> Empleado | None:
     """Devuelve el empleado con mayor salario mensual, o ``None`` sin plantilla."""
-    raise NotImplementedError
+    if not plantilla:
+        return None
+    return max(plantilla, key=lambda empleado: empleado.salario_mensual())

@@ -10,29 +10,41 @@ class CuentaBancaria:
         El saldo se guarda en ``_saldo`` y los movimientos en ``_movimientos``,
         que empieza vacía.
         """
-        raise NotImplementedError
+        if saldo_inicial < 0:
+            raise ValueError("El saldo inicial no puede ser negativo")
+        self.titular = titular
+        self._saldo = saldo_inicial
+        self._movimientos = []
 
     @property
     def saldo(self) -> float:
         """Saldo actual. Es de solo lectura."""
-        raise NotImplementedError
+        return self._saldo
 
     @property
     def movimientos(self) -> tuple:
         """Tupla con los importes de los movimientos: positivos los ingresos y
         negativos las retiradas."""
-        raise NotImplementedError
+        return tuple(self._movimientos)
 
     def ingresar(self, importe: float) -> None:
         """Suma el importe al saldo. Lanza ``ValueError`` si no es positivo."""
-        raise NotImplementedError
+        if importe <= 0:
+            raise ValueError("El importe debe ser positivo")
+        self._saldo += importe
+        self._movimientos.append(importe)
 
     def retirar(self, importe: float) -> None:
         """Resta el importe del saldo.
 
         Lanza ``ValueError`` si el importe no es positivo o si supera el saldo.
         """
-        raise NotImplementedError
+        if importe <= 0:
+            raise ValueError("El importe debe ser positivo")
+        if importe > self._saldo:
+            raise ValueError("El importe no puede superar el saldo")
+        self._saldo -= importe
+        self._movimientos.append(-importe)
 
 
 class Producto:
@@ -42,17 +54,20 @@ class Producto:
 
     def __init__(self, nombre: str, precio: float):
         """Guarda el nombre y el precio. El precio tiene que pasar por el setter."""
-        raise NotImplementedError
+        self.nombre = nombre
+        self.precio = precio  
 
     @property
     def precio(self) -> float:
         """Precio sin IVA."""
-        raise NotImplementedError
+        return self._precio
 
     @precio.setter
     def precio(self, valor: float) -> None:
         """Lanza ``ValueError`` si el valor es negativo."""
-        raise NotImplementedError
+        if valor < 0:
+            raise ValueError("El precio no puede ser negativo")
+        self._precio = valor
 
     @property
     def precio_con_iva(self) -> float:
@@ -61,7 +76,7 @@ class Producto:
         >>> Producto("Teclado", 100).precio_con_iva
         121.0
         """
-        raise NotImplementedError
+        return round(self._precio * (1 + self.IVA / 100), 2)
 
 
 class Temperatura:
@@ -71,17 +86,19 @@ class Temperatura:
 
     def __init__(self, celsius: float = 0.0):
         """Guarda la temperatura. Tiene que pasar por el setter de ``celsius``."""
-        raise NotImplementedError
+        self.celsius = celsius
 
     @property
     def celsius(self) -> float:
         """Temperatura en grados Celsius."""
-        raise NotImplementedError
+        return self._celsius
 
     @celsius.setter
     def celsius(self, valor: float) -> None:
         """Lanza ``ValueError`` si el valor es menor que ``CERO_ABSOLUTO``."""
-        raise NotImplementedError
+        if valor < self.CERO_ABSOLUTO:
+            raise ValueError("El valor debe ser mayor o igual que el cero absoluto")
+        self._celsius = valor
 
     @property
     def fahrenheit(self) -> float:
@@ -90,9 +107,9 @@ class Temperatura:
         >>> Temperatura(100).fahrenheit
         212.0
         """
-        raise NotImplementedError
+        return round(self._celsius * 9 / 5 + 32, 2)
 
     @fahrenheit.setter
     def fahrenheit(self, valor: float) -> None:
         """Convierte a Celsius y asigna a través de la propiedad ``celsius``."""
-        raise NotImplementedError
+        self.celsius = (valor - 32) * 5 / 9

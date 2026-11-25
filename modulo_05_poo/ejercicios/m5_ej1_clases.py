@@ -6,7 +6,8 @@ class Rectangulo:
 
     def __init__(self, base: float, altura: float):
         """Guarda la base y la altura en los atributos ``base`` y ``altura``."""
-        raise NotImplementedError
+        self.base = base
+        self.altura = altura
 
     def area(self) -> float:
         """Devuelve el área.
@@ -14,7 +15,7 @@ class Rectangulo:
         >>> Rectangulo(3, 4).area()
         12
         """
-        raise NotImplementedError
+        return self.base * self.altura
 
     def perimetro(self) -> float:
         """Devuelve el perímetro.
@@ -22,18 +23,18 @@ class Rectangulo:
         >>> Rectangulo(3, 4).perimetro()
         14
         """
-        raise NotImplementedError
+        return 2 * (self.base + self.altura)
 
     def es_cuadrado(self) -> bool:
         """Indica si la base y la altura son iguales."""
-        raise NotImplementedError
+        return self.base == self.altura
 
     def escalar(self, factor: float) -> "Rectangulo":
         """Devuelve un rectángulo NUEVO con las medidas multiplicadas por ``factor``.
 
         El rectángulo original no cambia.
         """
-        raise NotImplementedError
+        return Rectangulo(self.base * factor, self.altura * factor)
 
 
 class Contador:
@@ -47,7 +48,9 @@ class Contador:
 
         El contador recuerda además su valor inicial para poder reiniciarse.
         """
-        raise NotImplementedError
+        self.inicio = inicio
+        self.paso = paso
+        self.valor = inicio
 
     def incrementar(self) -> int:
         """Suma el paso al valor y devuelve el valor nuevo.
@@ -56,11 +59,12 @@ class Contador:
         >>> contador.incrementar(), contador.incrementar()
         (1, 2)
         """
-        raise NotImplementedError
+        self.valor += self.paso
+        return self.valor
 
     def reiniciar(self) -> None:
         """Devuelve el valor al inicial."""
-        raise NotImplementedError
+        self.valor = self.inicio
 
 
 class Tarea:
@@ -73,15 +77,19 @@ class Tarea:
         ``etiquetas``. Si no se pasan etiquetas, cada tarea tiene su propia
         lista vacía.
         """
-        raise NotImplementedError
+        self.titulo = titulo.strip()
+        self.completada = False
+        self.etiquetas = list(etiquetas) if etiquetas is not None else []
 
     def completar(self) -> None:
         """Marca la tarea como completada."""
-        raise NotImplementedError
+        self.completada = True
 
     def etiquetar(self, etiqueta: str) -> None:
         """Añade la etiqueta en minúsculas si la tarea no la tiene ya."""
-        raise NotImplementedError
+        etiqueta = etiqueta.lower()
+        if etiqueta not in self.etiquetas:
+            self.etiquetas.append(etiqueta)
 
     def resumen(self) -> str:
         """Devuelve "[x] título" si está completada y "[ ] título" si no.
@@ -89,4 +97,5 @@ class Tarea:
         >>> Tarea("Comprar pan").resumen()
         '[ ] Comprar pan'
         """
-        raise NotImplementedError
+        marca = "x" if self.completada else " "
+        return f"[{marca}] {self.titulo}"

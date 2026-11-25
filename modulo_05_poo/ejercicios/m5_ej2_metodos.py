@@ -8,7 +8,9 @@ class Dinero:
 
     def __init__(self, cantidad: float, moneda: str = "EUR"):
         """Guarda la cantidad redondeada a dos decimales y la moneda."""
-        raise NotImplementedError
+        self.cantidad = round(cantidad, 2)
+        self.moneda = moneda
+
 
     @staticmethod
     def es_moneda_valida(moneda: str) -> bool:
@@ -17,8 +19,9 @@ class Dinero:
         >>> Dinero.es_moneda_valida("EUR"), Dinero.es_moneda_valida("XXX")
         (True, False)
         """
-        raise NotImplementedError
+        return moneda in Dinero.MONEDAS
 
+    
     @classmethod
     def desde_texto(cls, texto: str) -> "Dinero":
         """Crea un objeto a partir de un texto como "12.50 EUR".
@@ -26,30 +29,33 @@ class Dinero:
         >>> Dinero.desde_texto("12.50 EUR")
         Dinero(12.5, 'EUR')
         """
-        raise NotImplementedError
+        cantidad, moneda = texto.split()
+        return cls(float(cantidad), moneda)
 
     def __repr__(self) -> str:
         """Devuelve la representación para depurar: Dinero(12.5, 'EUR')."""
-        raise NotImplementedError
+        return f"Dinero({self.cantidad!r}, {self.moneda!r})"
 
     def __str__(self) -> str:
         """Devuelve la representación para el usuario: "12.50 EUR"."""
-        raise NotImplementedError
+        return f"{self.cantidad:.2f} {self.moneda}"
 
     def __eq__(self, otro) -> bool:
         """Dos objetos Dinero son iguales si coinciden cantidad y moneda.
 
         Si ``otro`` no es un Dinero, devuelve ``NotImplemented``.
         """
-        raise NotImplementedError
+        if not isinstance(otro, Dinero):
+            return NotImplemented
+        return (self.cantidad, self.moneda) == (otro.cantidad, otro.moneda)
 
     def __lt__(self, otro: "Dinero") -> bool:
         """Compara por cantidad."""
-        raise NotImplementedError
+        return self.cantidad < otro.cantidad
 
     def __add__(self, otro: "Dinero") -> "Dinero":
         """Devuelve un Dinero NUEVO con la suma, en la moneda del primero."""
-        raise NotImplementedError
+        return Dinero(self.cantidad + otro.cantidad, self.moneda)
 
 
 class Playlist:
@@ -63,28 +69,31 @@ class Playlist:
 
     def __init__(self, nombre: str):
         """Guarda el nombre, crea la lista interna y suma uno a ``creadas``."""
-        raise NotImplementedError
+        self.nombre = nombre
+        self._canciones = []
+        Playlist.creadas += 1
 
     def anadir(self, cancion: str) -> None:
         """Añade una canción al final."""
-        raise NotImplementedError
+        self._canciones.append(cancion)
 
     def __len__(self) -> int:
         """Devuelve el número de canciones."""
-        raise NotImplementedError
+        return len(self._canciones)
 
     def __contains__(self, cancion: str) -> bool:
         """Indica si la canción está, sin distinguir mayúsculas de minúsculas."""
-        raise NotImplementedError
+        buscada = cancion.lower()
+        return any(c.lower() == buscada for c in self._canciones)
 
     def __iter__(self):
         """Permite recorrer las canciones con un ``for``."""
-        raise NotImplementedError
+        return iter(self._canciones)
 
     def __getitem__(self, posicion: int) -> str:
         """Devuelve la canción de la posición indicada."""
-        raise NotImplementedError
+        return self._canciones[posicion]
 
     def __str__(self) -> str:
         """Devuelve "nombre (N canciones)"."""
-        raise NotImplementedError
+        return f"{self.nombre} ({len(self)} canciones)"
