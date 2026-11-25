@@ -24,12 +24,15 @@ class Material(ABC):
 
         La disponibilidad se guarda en el atributo interno ``_disponible``.
         """
-        raise NotImplementedError
+        self.codigo = codigo
+        self.titulo = titulo
+        self.anio = anio
+        self._disponible = True
 
     @property
     def disponible(self) -> bool:
         """Indica si el material se puede prestar. Solo lectura."""
-        raise NotImplementedError
+        return self._disponible
 
     @property
     @abstractmethod
@@ -41,29 +44,35 @@ class Material(ABC):
 
         Lanza ``ValueError`` si ya estaba prestado.
         """
-        raise NotImplementedError
+        if not self._disponible:
+            raise ValueError(f"{self.codigo} ya está prestado")
+        self._disponible = False
 
     def devolver(self) -> None:
         """Marca el material como disponible.
 
         Lanza ``ValueError`` si no estaba prestado.
         """
-        raise NotImplementedError
+        if self._disponible:
+            raise ValueError(f"{self.codigo} no está prestado")
+        self._disponible = True
 
     def __str__(self) -> str:
         """Devuelve "[codigo] titulo (anio)"."""
-        raise NotImplementedError
+        return f"[{self.codigo}] {self.titulo} ({self.anio})"
 
     def __repr__(self) -> str:
         """Devuelve "Clase('codigo', 'titulo')" con el nombre de la clase real."""
-        raise NotImplementedError
+        return f"{type(self).__name__}({self.codigo!r}, {self.titulo!r})"
 
     def __eq__(self, otro) -> bool:
         """Dos materiales son iguales si tienen el mismo código.
 
         Si ``otro`` no es un Material, devuelve ``NotImplemented``.
         """
-        raise NotImplementedError
+        if not isinstance(otro, Material):
+            return NotImplemented
+        return self.codigo == otro.codigo
 
     def __hash__(self) -> int:
         return hash(self.codigo)
@@ -74,15 +83,16 @@ class Libro(Material):
 
     def __init__(self, codigo: str, titulo: str, anio: int, autor: str):
         """Inicializa la parte heredada y guarda ``autor``."""
-        raise NotImplementedError
+        super().__init__(codigo, titulo, anio)
+        self.autor = autor
 
     @property
     def dias_prestamo(self) -> int:
-        raise NotImplementedError
+        return 21
 
     def __str__(self) -> str:
         """Añade el autor a la descripción heredada: "[codigo] titulo (anio), de autor"."""
-        raise NotImplementedError
+        return f"{super().__str__()}, de {self.autor}"
 
 
 class Revista(Material):
@@ -90,15 +100,16 @@ class Revista(Material):
 
     def __init__(self, codigo: str, titulo: str, anio: int, numero: int):
         """Inicializa la parte heredada y guarda ``numero``."""
-        raise NotImplementedError
+        super().__init__(codigo, titulo, anio)
+        self.numero = numero
 
     @property
     def dias_prestamo(self) -> int:
-        raise NotImplementedError
+        return 7
 
     def __str__(self) -> str:
         """Añade el número: "[codigo] titulo (anio), n.º numero"."""
-        raise NotImplementedError
+        return f"{super().__str__()}, n.º {self.numero}"
 
 
 class Dvd(Material):
@@ -106,11 +117,12 @@ class Dvd(Material):
 
     def __init__(self, codigo: str, titulo: str, anio: int, minutos: int):
         """Inicializa la parte heredada y guarda ``minutos``."""
-        raise NotImplementedError
+        super().__init__(codigo, titulo, anio)
+        self.minutos = minutos
 
     @property
     def dias_prestamo(self) -> int:
-        raise NotImplementedError
+        return 3
 
 
 @dataclass
@@ -124,11 +136,14 @@ class Socio:
 
     MAX_PRESTAMOS = 3
 
-    # TODO: declara aquí los campos numero, nombre y prestados
+    numero: int
+    nombre: str
+    prestados: list[Material] = field(default_factory=list)
+
 
     def puede_tomar_prestado(self) -> bool:
         """Indica si el socio tiene menos de ``MAX_PRESTAMOS`` materiales."""
-        raise NotImplementedError
+        return len(self.prestados) < self.MAX_PRESTAMOS
 
 
 @dataclass
@@ -138,20 +153,22 @@ class Prestamo:
     Campos: ``material`` (Material), ``socio`` (Socio) y ``fecha`` (date).
     """
 
-    # TODO: declara aquí los campos material, socio y fecha
+    material: Material
+    socio: Socio
+    fecha: date
 
     @property
     def fecha_devolucion(self) -> date:
         """Fecha límite: la del préstamo más los días que permite el material."""
-        raise NotImplementedError
+        return self.fecha + timedelta(days=self.material.dias_prestamo)
 
     def dias_de_retraso(self, hoy: date) -> int:
         """Días transcurridos desde la fecha límite. Si no ha vencido, 0."""
-        raise NotImplementedError
+        return max(0, (hoy - self.fecha_devolucion).days)
 
     def esta_vencido(self, hoy: date) -> bool:
         """Indica si ``hoy`` es posterior a la fecha límite."""
-        raise NotImplementedError
+        return hoy > self.fecha_devolucion
 
 
 class Biblioteca:
@@ -164,7 +181,10 @@ class Biblioteca:
 
     def __init__(self, nombre: str):
         """Guarda el nombre y crea ``_materiales``, ``_socios`` y ``_prestamos`` vacíos."""
-        raise NotImplementedError
+        self.nombre = nombre
+        self._materiales = {}
+        self._socios = {}
+        self._prestamos = []
 
     # ------------------------------------------------------------- catálogo
     def anadir_material(self, material: Material) -> None:
@@ -172,34 +192,39 @@ class Biblioteca:
 
         Lanza ``ValueError`` si ya hay un material con ese código.
         """
-        raise NotImplementedError
+        if material.codigo in self._materiales:
+            raise ValueError(f"Ya existe un material con el código {material.codigo}")
+        self._materiales[material.codigo] = material
 
     def buscar(self, codigo: str) -> Material | None:
         """Devuelve el material con ese código, o ``None`` si no existe."""
-        raise NotImplementedError
+        return self._materiales.get(codigo)
 
     def buscar_por_titulo(self, texto: str) -> list[Material]:
         """Devuelve los materiales cuyo título contiene el texto.
 
         No distingue mayúsculas de minúsculas. El resultado va ordenado por título.
         """
-        raise NotImplementedError
+        texto = texto.lower()
+        encontrados = [m for m in self._materiales.values() if texto in m.titulo.lower()]
+        return sorted(encontrados, key=lambda m: m.titulo)
 
     def disponibles(self) -> list[Material]:
         """Devuelve los materiales disponibles, ordenados por código."""
-        raise NotImplementedError
+        libres = [m for m in self._materiales.values() if m.disponible]
+        return sorted(libres, key=lambda m: m.codigo)
 
     def __len__(self) -> int:
         """Devuelve el número de materiales del catálogo."""
-        raise NotImplementedError
+        return len(self._materiales)
 
     def __contains__(self, codigo: str) -> bool:
         """Indica si hay un material con ese código."""
-        raise NotImplementedError
+        return codigo in self._materiales
 
     def __iter__(self):
         """Recorre los materiales del catálogo en el orden en que se añadieron."""
-        raise NotImplementedError
+        return iter(self._materiales.values())
 
     # --------------------------------------------------------------- socios
     def registrar_socio(self, nombre: str) -> Socio:
@@ -207,11 +232,13 @@ class Biblioteca:
 
         Los números empiezan en 1 y son consecutivos.
         """
-        raise NotImplementedError
+        nuevo = Socio(len(self._socios) + 1, nombre)
+        self._socios[nuevo.numero] = nuevo
+        return nuevo
 
     def socio(self, numero: int) -> Socio | None:
         """Devuelve el socio con ese número, o ``None`` si no existe."""
-        raise NotImplementedError
+        return self._socios.get(numero)
 
     # ------------------------------------------------------------ préstamos
     def prestar(self, codigo: str, numero_socio: int, fecha: date) -> Prestamo:
@@ -227,7 +254,19 @@ class Biblioteca:
         Si todo es correcto: marca el material como prestado, lo añade a la
         lista del socio y guarda el préstamo.
         """
-        raise NotImplementedError
+        material = self.buscar(codigo)
+        if material is None:
+            raise ValueError(f"No existe el material {codigo}")
+        socio = self.socio(numero_socio)
+        if socio is None:
+            raise ValueError(f"No existe el socio {numero_socio}")
+        if not socio.puede_tomar_prestado():
+            raise ValueError(f"{socio.nombre} ha alcanzado el máximo de préstamos")
+        material.prestar()
+        socio.prestados.append(material)
+        prestamo = Prestamo(material, socio, fecha)
+        self._prestamos.append(prestamo)
+        return prestamo
 
     def devolver(self, codigo: str) -> Prestamo:
         """Registra la devolución de un material y devuelve el préstamo cerrado.
@@ -236,17 +275,27 @@ class Biblioteca:
         si ese material no está prestado. Si lo está: lo marca como
         disponible, lo quita de la lista del socio y elimina el préstamo.
         """
-        raise NotImplementedError
+        for prestamo in self._prestamos:
+            if prestamo.material.codigo == codigo:
+                prestamo.material.devolver()
+                prestamo.socio.prestados.remove(prestamo.material)
+                self._prestamos.remove(prestamo)
+                return prestamo
+        raise ValueError(f"No hay ningún préstamo de {codigo}")
 
     @property
     def prestamos(self) -> tuple:
         """Tupla con los préstamos en curso, en el orden en que se hicieron."""
-        raise NotImplementedError
+        return tuple(self._prestamos)
 
     def prestamos_vencidos(self, hoy: date) -> list[Prestamo]:
         """Devuelve los préstamos vencidos, del que lleva más retraso al que menos."""
-        raise NotImplementedError
+        vencidos = [p for p in self._prestamos if p.esta_vencido(hoy)]
+        return sorted(vencidos, key=lambda p: p.dias_de_retraso(hoy), reverse=True)
 
     def resumen(self) -> str:
         """Devuelve "nombre: N materiales, D disponibles, S socios"."""
-        raise NotImplementedError
+        return (
+            f"{self.nombre}: {len(self)} materiales, "
+            f"{len(self.disponibles())} disponibles, {len(self._socios)} socios"
+        )
